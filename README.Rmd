@@ -1,0 +1,20 @@
+---
+title: "Stream Hydrology"
+author: "Brianna Pierce"
+date: "2026-05-19"
+output: html_document
+---
+
+This repo contains the scripts necessary for running hydrology metrics on stream discharge and stage data.
+
+## Calculated metrics include:  
+- Richards-Baker Index (RBI)  
+- TQmean  
+- Flow reversals
+
+
+## Data source
+Data are pulled in via Herrera's DRIP API. Data are collected by Herrera and King County as part of Bellevue's Environmental Monitoring Program.
+
+## Output
+Data results are saved to the EMP Data Library on SharePoint.
