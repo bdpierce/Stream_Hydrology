@@ -2,14 +2,22 @@ Stream Hydrology
 ================
 
 
-This repo contains the scripts necessary for running hydrology metrics
+This repo contains the scripts for running hydrology metrics
 on stream discharge and stage data.
 
 ## Calculated metrics include:
 
-- TQmean
-- Richards-Baker Index (RBI)
-- Flow reversals
+- TQmean - The fraction of time during a water year that the daily
+average flow rate is greater than the annual average
+flow rate of that year.
+- Richards-Baker Index (RBI) - A dimensionless index of flow
+oscillations relative to total flow, based on daily
+average discharge measured during a water year.
+- Flow reversals - The number of times that the flow rate changed from
+an increase to a decrease or vice versa during a water
+year.
+
+(Definitions from Booth and Konrad 2017)
 
 ## Data source
 
