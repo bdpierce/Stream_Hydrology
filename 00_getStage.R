@@ -13,69 +13,57 @@ require(tidyr)
 require(httr2)
 require(jsonlite)
 require(dotenv)
+require(arrow)
+require(lubridate)
 
 
 # Create a function to get data via the API ------------------------------------
-getStage <- function(start_date = "2022-10-01",
-                     end_date = "2025-09-30",
-                     limit = "900_000") {
+
+getStage <- function(start_date = NULL,
+                     end_date = NULL) {     #Setting the start and end dates to null fetches all available data
   
-  # Load EDMS secrets from env file
+  # load EDMS secrets from .env file
   dotenv::load_dot_env(file = "env")
   
   # Build the URL
-  url         <-  'https://hec-drip-edms.azurewebsites.net/ts'
-  project     <-  Sys.getenv("EDMS_PROJECT")
-  secret      <-  Sys.getenv("EDMS_API_KEY")
-  endpoint    <-  "inst_vals"
-  query_params = c("project" = project,
-                   "parameter" = "Stage",
-                   "start_date" = start_date,
-                   "end_date" = end_date,
-                   "timezone" = "US/Pacific",
-                   "limit" = limit)
+  url <- 'https://hec-drip-edms.azurewebsites.net/ts'
+  project <- Sys.getenv("EDMS_PROJECT")
+  secret <- Sys.getenv("EDMS_API_KEY")
+  query_params <- c("start_date" = start_date, "end_date" = end_date)
+  endpoint <- "pqt"
   
-  # Get set up
-  JSON_export <- list()
-  data <- data.frame()
+  # Note, these column names will be changing with the next API update so I will need to change them. Could make this dynamic by first calling the table names from the API and then using fuzzy matching to pull the relevant columns.
+  columns = c(
+    "Stage_ft_Bellevue Utilities - COB-WT3_Stage-ft (time-corr)",
+    "Stage_ft_Bellevue Utilities - RichardsBelRM0.4_Water-Lvl-ft",
+    "Stage_ft_Bellevue Utilities 08LAK2827_Water-Lvl-ft"
+  )
   
-  # Get the data
-  while (!is.null(query_params[[1]])) {
-    # REQUEST BUILD
-    response  <- request(url) %>%
-      req_headers("accept" = "application/json") %>%
-      req_headers("x-api-key" = secret)  %>%
-      req_url_path_append(project) %>%  # required on all
-      req_url_path_append(endpoint) %>%     # required on all
-      req_url_query(!!!query_params)
-    
-    # REQUEST PERFORM AND TRANSFORM TO JSON
-    table_info <- req_perform(response) %>%
-      resp_body_string() %>%
-      fromJSON()
-    
-    if(length(data) == 0){
-      data <- data.frame(table_info$results)
-    } else{
-      data <- rbind(data, data.frame(table_info$results))
-    }
-    
-    query_params <- table_info$next_params
-    
-  }
+  # REQUEST BUILD
+  request <- request(url) %>%
+    req_headers("accept" = "application/json") %>%
+    req_headers("x-api-key" = secret) %>%
+    req_url_path_append(project) %>% 
+    req_url_path_append(endpoint) %>% 
+    req_body_json(columns) %>%
+    req_url_query(!!!query_params) %>%
+    req_method("GET")
   
-  # Return the dataframe
+  # REQUEST PERFORM AND TRANSFORM TO JSON
+  response <- req_perform(request)
+  
+  data <- read_parquet(response$body) # Final output from the API
+  
+  # Clean up the data by removing timestamps with no associated stage
+  # data <- data %>% drop_na(all_of(columns))
+  # Keep rows where the count of NAs is less than the total number of columns
+  data <- data[rowSums(is.na(data)) < ncol(data)-1, ]
+  
+  
+  
   return(data)
-  
 }
 
 # Test the function ----
 #x <- getStage()
-
-
-
-
-
-
-
 
