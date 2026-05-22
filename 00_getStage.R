@@ -20,9 +20,12 @@ require(lubridate)
 # Create a function to get data via the API ------------------------------------
 
 getStage <- function(start_date = NULL,
-                     end_date = NULL) {     #Setting the start and end dates to null fetches all available data
+                     end_date = NULL,
+                     aggregation_unit = c("15 mins", "hour", "day", "week", "month", "quarter", "season", "year")) {     #Setting the start and end dates to null fetches all available data
+  # Check user input against valid options listed above
+  aggregation_unit <- match.arg(aggregation_unit)
   
-  # load EDMS secrets from .env file
+  # Load EDMS secrets from .env file
   dotenv::load_dot_env(file = "env")
   
   # Build the URL
@@ -32,6 +35,7 @@ getStage <- function(start_date = NULL,
   query_params <- c("start_date" = start_date, "end_date" = end_date)
   endpoint <- "pqt"
   
+  # Specify columns (gauges)
   # Note, these column names will be changing with the next API update so I will need to change them. Could make this dynamic by first calling the table names from the API and then using fuzzy matching to pull the relevant columns.
   columns = c(
     "Stage_ft_Bellevue Utilities - COB-WT3_Stage-ft (time-corr)",
@@ -54,16 +58,35 @@ getStage <- function(start_date = NULL,
   
   data <- read_parquet(response$body) # Final output from the API
   
-  # Clean up the data by removing timestamps with no associated stage
-  # data <- data %>% drop_na(all_of(columns))
-  # Keep rows where the count of NAs is less than the total number of columns
+  # CLEAN UP
+  # Remove rows where there is no stage for any gauge associated with the timestamp
   data <- data[rowSums(is.na(data)) < ncol(data)-1, ]
   
+  # Clean up the timestamps and aggregate
+  data <- data %>% 
+    pivot_longer(cols = columns, 
+                 names_to = "Gauge", 
+                 values_to = "Stage_ft")
   
+  if (aggregation_unit == "15 min") {
+    data$datetime <- round_date(data$datetime, "15 mins")
+  } else {
+    data$datetime <- floor_date(data$datetime, aggregation_unit)  
+  }
+    
+  data <- data %>% 
+    drop_na(Stage_ft) %>% 
+    pivot_wider(id_cols = datetime, 
+                names_from = Gauge, 
+                values_from = Stage_ft,
+                values_fn=mean) # Average values on the same time step
   
   return(data)
 }
 
 # Test the function ----
-#x <- getStage()
-
+# x <- getStage()
+# View(x)
+# 
+# x1 <- getStage(aggregation_unit = "hour")
+# View(x1)
