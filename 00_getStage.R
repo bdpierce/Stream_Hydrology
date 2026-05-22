@@ -81,6 +81,11 @@ getStage <- function(start_date = NULL,
                 values_from = Stage_ft,
                 values_fn=mean) # Average values on the same time step
   
+  # Add the water year
+  data$WY <- ""
+  data$WY[month(data$datetime) >= 10] <- year(data$datetime[month(data$datetime) >= 10])+1
+  data$WY[month(data$datetime) < 10] <- year(data$datetime[month(data$datetime) < 10])
+  
   return(data)
 }
 
@@ -90,3 +95,6 @@ getStage <- function(start_date = NULL,
 # 
 # x1 <- getStage(aggregation_unit = "hour")
 # View(x1)
+
+x <- getStage(aggregation_unit = "day")
+View(x)
