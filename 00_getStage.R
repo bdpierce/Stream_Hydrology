@@ -3,7 +3,7 @@
 # Author: Brianna Pierce
 # Email: bpierce@bellevuewa.gov
 # Created: 2026-05-21
-# Revised: 2026-05-21
+# Revised: 2026-05-27
 # ------------------------------------------------------------------------------
 
 
@@ -18,11 +18,6 @@ require(lubridate)
 
 
 # Create a function to get data via the API ------------------------------------
-
-# For dev only
-start_date = NULL
-end_date = NULL
-aggregation_unit = "15 mins"
 
 getStage <- function(start_date = NULL,
                      end_date = NULL,
