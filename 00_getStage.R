@@ -93,14 +93,6 @@ getStage <- function(start_date = NULL,
     pivot_longer(cols = all_of(cleancolnames), 
                  names_to = "Gauge", 
                  values_to = "Stage_ft")  
-
-    
-  # data <- data %>% 
-  #   drop_na(Stage_ft) %>% 
-  #   pivot_wider(id_cols = datetime, 
-  #               names_from = Gauge, 
-  #               values_from = Stage_ft,
-  #               values_fn=mean) # Average values on the same time step
   
   # Add the water year
   data$WY <- ""
