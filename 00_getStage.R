@@ -19,6 +19,11 @@ require(lubridate)
 
 # Create a function to get data via the API ------------------------------------
 
+# For dev only
+start_date = NULL
+end_date = NULL
+aggregation_unit = "15 mins"
+
 getStage <- function(start_date = NULL,
                      end_date = NULL,
                      aggregation_unit = c("15 mins", "hour", "day", "week", "month", "quarter", "season", "year")) {     #Setting the start and end dates to null fetches all available data
@@ -36,7 +41,8 @@ getStage <- function(start_date = NULL,
   endpoint <- "pqt"
   
   # Specify columns (gauges)
-  # Note, these column names will be changing with the next API update so I will need to change them. Could make this dynamic by first calling the table names from the API and then using fuzzy matching to pull the relevant columns.
+  # !!! Note, these column names will be changing with the next API update 
+  #     so I will need to change them. Could make this dynamic by first calling the table names from the API and then using fuzzy matching to pull the relevant columns.
   columns = c(
     "Stage_ft_Bellevue Utilities - COB-WT3_Stage-ft (time-corr)",
     "Stage_ft_Bellevue Utilities - RichardsBelRM0.4_Water-Lvl-ft",
@@ -62,24 +68,39 @@ getStage <- function(start_date = NULL,
   # Remove rows where there is no stage for any gauge associated with the timestamp
   data <- data[rowSums(is.na(data)) < ncol(data)-1, ]
   
-  # Clean up the timestamps and aggregate
-  data <- data %>% 
-    pivot_longer(cols = columns, 
-                 names_to = "Gauge", 
-                 values_to = "Stage_ft")
+  # Tidy up the station names
+  # !!! Warning !!! Hard coding the station names like this is not a good idea.
+  #     Once the API is updated, parse the station names so that they remain dynamic
+  cleancolnames <- c("COB_WT3", "RichardsBelRM0.4", "08LAK2827")
+  colnames(data)[2:4] <- cleancolnames
   
+  # Clean up the timestamps
   if (aggregation_unit == "15 min") {
     data$datetime <- round_date(data$datetime, "15 mins")
   } else {
     data$datetime <- floor_date(data$datetime, aggregation_unit)  
   }
-    
+  
   data <- data %>% 
-    drop_na(Stage_ft) %>% 
-    pivot_wider(id_cols = datetime, 
-                names_from = Gauge, 
+    pivot_longer(cols = all_of(cleancolnames), 
+                 names_to = "Gauge", 
+                 values_to = "Stage_ft") %>% 
+    drop_na(Stage_ft) %>%                        # Remove blank readings
+    pivot_wider(id_cols = datetime,
+                names_from = Gauge,
                 values_from = Stage_ft,
-                values_fn=mean) # Average values on the same time step
+                values_fn=mean) %>%              # Average values on the same time step (sometimes a logger will record twice a few seconds apart)
+    pivot_longer(cols = all_of(cleancolnames), 
+                 names_to = "Gauge", 
+                 values_to = "Stage_ft")  
+
+    
+  # data <- data %>% 
+  #   drop_na(Stage_ft) %>% 
+  #   pivot_wider(id_cols = datetime, 
+  #               names_from = Gauge, 
+  #               values_from = Stage_ft,
+  #               values_fn=mean) # Average values on the same time step
   
   # Add the water year
   data$WY <- ""
@@ -92,9 +113,9 @@ getStage <- function(start_date = NULL,
 # Test the function ----
 # x <- getStage()
 # View(x)
-# 
+
 # x1 <- getStage(aggregation_unit = "hour")
 # View(x1)
 
-x <- getStage(aggregation_unit = "day")
-View(x)
+# x <- getStage(aggregation_unit = "day")
+# View(x)
