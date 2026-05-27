@@ -27,3 +27,8 @@ and King County as part of Bellevue’s Environmental Monitoring Program.
 ## Output
 
 Data results are saved to the EMP Data Library on SharePoint.
+
+## File structure
+
+- File names beginning with 00_ do not rely on other scripts. These scripts often define functions. 
+- File names beginning 01_ are dependent on 00_ level scripts. And so on.
