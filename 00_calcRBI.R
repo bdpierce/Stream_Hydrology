@@ -11,13 +11,7 @@
 #     mean daily discharge (or stage) by the sum of the daily mean over the WY.
 
 
-# For development only: get the data
-# source("00_getStage.R")
-# daily <- getStage(aggregation_unit = "day")
-# daily_data <- daily
-# View(daily_data)
-
-# Required Packages ------------------------------------------------------------
+# Load required packages -------------------------------------------------------
 require(dplyr)
 
 # Create a function to calculate the RBI ---------------------------------------
@@ -34,12 +28,9 @@ calcRBI <- function(daily_data){
   # Calculate RBI
   rbi <- daily_data %>% 
     summarize(RBI = sum(stage_diff, na.rm=T)/sum(Stage_ft),
-              SampledDays = sum(!is.na(Stage_ft))+1,  # Because stage_diff includes a lag, one row for each WY will be NA and is removed. Thus, we need to add 1 to get a correct sample completeness.
+              SampledDays = sum(!is.na(Stage_ft))+1,  # Because stage_diff includes a lag, one row for each WY will be NA and is removed. Thus, we need to add 1 to get correct sample completeness.
               PercentComplete = round((sum(!is.na(Stage_ft))+1)/yday(paste0(max(WY), "-12-31"))*100, 1))
   
   return(rbi)
 }
 
-
-# Test the function
-#calcRBI(daily)

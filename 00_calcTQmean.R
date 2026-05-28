@@ -5,16 +5,10 @@
 # ------------------------------------------------------------------------------
 
 # *** TQmean is the fraction of time during a water year that the daily average 
-#     flow rate is greater than the annual average flow rate of that year.
+#     stage or discharge is greater than the annual average value of that year.
 
 
-# For development only: get the data
-# source("00_getStage.R")
-# daily <- getStage(aggregation_unit = "day")
-# daily_data <- daily
-# View(daily_data)
-
-# Required Packages ------------------------------------------------------------
+# Load required packages -------------------------------------------------------
 require(dplyr)
 
 # Create a function to calculate the TQmean ------------------------------------
@@ -38,5 +32,3 @@ calcTQmean <- function(daily_data) {
   return(TQmean)
 }
 
-# Test the function
-#calcTQmean(daily_data)

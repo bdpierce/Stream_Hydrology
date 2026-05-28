@@ -9,13 +9,7 @@
 # *** This metric uses daily average data from Oct 1 to April 30 of the WY.
 
 
-# For development only: get the data
-# source("00_getStage.R")
-# daily <- getStage(aggregation_unit = "day")
-# daily_data <- daily
-# View(daily_data)
-
-# Required Packages ------------------------------------------------------------
+# Load required packages -------------------------------------------------------
 require(dplyr)
 require(lubridate)
 
@@ -40,5 +34,3 @@ calcReversals <- function(daily_data){
   return(revs)
 }
 
-# Test the function
-# calcReversals(daily)
