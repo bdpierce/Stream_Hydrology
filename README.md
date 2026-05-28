@@ -2,8 +2,9 @@ Stream Hydrology
 ================
 
 
-This repo contains the scripts for running hydrology metrics
-on stream discharge and stage data.
+This repository contains the scripts for running hydrology metrics
+on stream discharge and stage data. This work is part of the City of Bellevue's 
+Stream Environmental Monitoring Program.
 
 ## Calculated metrics include:
 
@@ -13,8 +14,8 @@ value for that water year.
 - **Richards-Baker Index (RBI)** - A dimensionless index of flow or stage
 oscillations relative to total flow/stage, based on daily
 average values measured during a water year.
-- **Reversals** - The number of times that the stage or discharge changed from
-an increase to a decrease or vice versa during a water year.
+- **Reversals** - The number of times that the daily average stage or discharge 
+changed from an increase to a decrease or vice versa during a water year.
 
 (Definitions adapted from Booth and Konrad 2017)
 
