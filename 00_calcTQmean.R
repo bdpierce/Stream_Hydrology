@@ -27,7 +27,7 @@ calcTQmean <- function(daily_data) {
   TQmean <- daily_data %>% 
     summarize(TQmean = sum(tqm_flag, na.rm=T)/sum(!is.na(Stage_ft)), 
               SampledDays = sum(!is.na(Stage_ft)),
-              PercentComplete = round(sum(!is.na(Stage_ft))/yday(paste0(max(WY), "-12-31"))*100, 1) )
+              WYPercentComplete = round(sum(!is.na(Stage_ft))/yday(paste0(max(WY), "-12-31"))*100, 1) )
   
   return(TQmean)
 }

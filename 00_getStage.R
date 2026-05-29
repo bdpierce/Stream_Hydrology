@@ -2,8 +2,6 @@
 # Purpose: Pulls in Bellevue's stage data from the Herrera DRIP API
 # Author: Brianna Pierce
 # Email: bpierce@bellevuewa.gov
-# Created: 2026-05-21
-# Revised: 2026-05-27
 # ------------------------------------------------------------------------------
 
 
@@ -97,12 +95,3 @@ getStage <- function(start_date = NULL,
   return(data)
 }
 
-# Test the function ----
-# x <- getStage()
-# View(x)
-
-# x1 <- getStage(aggregation_unit = "hour")
-# View(x1)
-
-# x <- getStage(aggregation_unit = "day")
-# View(x)

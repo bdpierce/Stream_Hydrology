@@ -30,7 +30,7 @@ calcReversals <- function(daily_data){
   revs <- daily_data %>% 
     summarise(Reversals = sum(reversal_flag, na.rm = T),
               SampledDays = sum(!is.na(Stage_ft)),
-              PercentComplete = round(sum(!is.na(Stage_ft))/(1+as.integer(difftime(ymd(paste0(max(year(datetime)), "-4-30")), ymd(paste0(min(year(datetime)), "-10-01")))))*100, 1) )
+              ReversalPercentComplete = round(sum(!is.na(Stage_ft))/(1+as.integer(difftime(ymd(paste0(max(year(datetime)), "-4-30")), ymd(paste0(min(year(datetime)), "-10-01")))))*100, 1) )
   return(revs)
 }
 

@@ -10,6 +10,10 @@
 # *** RBI is computed by dividing the sum of the absolute day-to-day changes in 
 #     mean daily discharge (or stage) by the sum of the daily mean over the WY.
 
+# Baker, D.B., R.P. Richards, T.T. Loftus, and J.W. Kramer.  2004.  A New Flashiness Index:
+# Characteristics and Applications to Midwestern Rivers and Streams.  April 2004.
+# Journal of the American Water Resources Association (JAWRA).  Pages 503:522.
+
 
 # Load required packages -------------------------------------------------------
 require(dplyr)
@@ -29,7 +33,7 @@ calcRBI <- function(daily_data){
   rbi <- daily_data %>% 
     summarize(RBI = sum(stage_diff, na.rm=T)/sum(Stage_ft),
               SampledDays = sum(!is.na(Stage_ft))+1,  # Because stage_diff includes a lag, one row for each WY will be NA and is removed. Thus, we need to add 1 to get correct sample completeness.
-              PercentComplete = round((sum(!is.na(Stage_ft))+1)/yday(paste0(max(WY), "-12-31"))*100, 1))
+              WYPercentComplete = round((sum(!is.na(Stage_ft))+1)/yday(paste0(max(WY), "-12-31"))*100, 1))
   
   return(rbi)
 }
